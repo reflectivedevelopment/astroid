@@ -274,6 +274,8 @@ namespace Astroid {
         [&] (Key) {
           if (!message_sent && sending_in_progress.load ()) {
             sending_message->cancel_sending ();
+
+            /* send_message_finished will still be called to clean up sending_message */
           }
 
           return true;
@@ -465,6 +467,7 @@ namespace Astroid {
         /* move to key handler:
          * warning_str = "draft could not be saved!"; */
         /* on_tv_ready (); */
+        delete c;
         return false;
 
       } else {
@@ -487,6 +490,7 @@ namespace Astroid {
             new AddDraftMessage (fname)));
     }
 
+    delete c;
     draft_saved = true;
     return true;
   }
@@ -830,6 +834,7 @@ namespace Astroid {
     if (c->encrypt || c->sign) {
       if (!c->encryption_success) {
         warning_str = "Cannot send, failed encrypting: " + UstringUtils::replace (c->encryption_error, "\n", "<br />");
+        delete c;
         return false;
       }
     }
